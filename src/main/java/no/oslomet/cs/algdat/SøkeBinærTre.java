@@ -185,19 +185,48 @@ public class SøkeBinærTre<T> implements Beholder<T> {
     }
 
     // Oppgave 4
+
     public void postOrden(Oppgave<? super T> oppgave) {
-        throw new UnsupportedOperationException();
+        // Metoden utfører postorden-traversering iterativt og anvender 'oppgave' på hver node i postorden.
+
+        Node<T> node = førstePostorden(rot); //Denne linjen finner den aller første noden i postorden, som begynner fra roten av treet.
+
+        oppgave.utførOppgave(node.verdi);// Utfør oppgaven på verdien til denne første noden.
+
+
+        while (true) {  //  En løkke som fortsetter å finne neste node i postorden og utføre oppgaven.
+            node = nestePostorden(node); // Finn neste node i postorden, basert på gjeldende node.
+
+            if (node == null) {  // Hvis det ikke er flere noder igjen (node er null), avslutt løkken.
+                break; // Bryter ut av løkken når vi har besøkt alle noder.
+            }
+
+            oppgave.utførOppgave(node.verdi); // Utfør oppgaven på verdien til den nåværende noden.
+        }
     }
 
     public void postOrdenRekursiv(Oppgave<? super T> oppgave) {
         postOrdenRekursiv(rot, oppgave); // Ferdig implementert
+        // Metoden kaller en rekursiv versjon av postorden-traversering, som starter fra roten.
     }
 
     private void postOrdenRekursiv(Node<T> p, Oppgave<? super T> oppgave) {
-        throw new UnsupportedOperationException();
+        // Rekursiv metode som går gjennom treet i postorden og utfører oppgaven.
+
+        if (p == null) {  // Hvis noden p er null (basistilfelle), gjør ingenting og returner.
+            return;
+        }
+
+        postOrdenRekursiv(p.venstre, oppgave); // Utfør rekursjon på venstre undertre, først besøk venstre barn i postorden.
+
+        postOrdenRekursiv(p.høyre, oppgave); // Utfør rekursjon på høyre undertre, deretter besøk høyre barn i postorden.
+
+        oppgave.utførOppgave(p.verdi);  // Utfør oppgaven på verdien til noden p etter at begge barn er besøkt.
+
     }
 
     // Oppgave 5
+
     public boolean fjern(T verdi) {
         throw new UnsupportedOperationException();
     }
