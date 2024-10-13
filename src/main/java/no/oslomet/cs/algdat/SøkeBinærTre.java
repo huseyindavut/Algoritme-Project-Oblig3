@@ -151,11 +151,37 @@ public class SøkeBinærTre<T> implements Beholder<T> {
 
     // Oppgave 3
     private Node<T> førstePostorden(Node<T> p) {
-        throw new UnsupportedOperationException();
+        // Metoden returnerer den første noden i postorden når 'p' er roten til et tre/undertre.
+
+        Node<T> binærTreNode = p;  // Starter med noden 'p', som er roten til undertreet.
+
+        while (true) { // Evig løkke (som stoppes når vi returnerer noden).
+            if (binærTreNode.venstre != null) { // Hvis noden har et venstre barn, går vi til venstre undertre (venstre besøkes først i postorden).
+                binærTreNode = binærTreNode.venstre;  // Oppdaterer noden til venstre barn.
+            } else if (binærTreNode.høyre != null) {  // Hvis venstre barn er null, men det finnes et høyre barn, går vi til høyre barn.
+                binærTreNode = binærTreNode.høyre; // Oppdaterer noden til høyre barn.
+            } else { // Hvis noden ikke har venstre eller høyre barn, er vi på et blad, og dette er første node i postorden.
+                return binærTreNode;  // Returnerer første node i postorden.
+            }
+        }
     }
 
     private Node<T> nestePostorden(Node<T> p) {
-        throw new UnsupportedOperationException();
+        // Metoden returnerer den neste noden i postorden etter noden 'p'. Hvis 'p' er siste node, returnerer vi null.
+
+        if (p.forelder == null) { // Hvis 'p' ikke har en forelder (det er roten), så er det ingen flere noder i postorden, vi returnerer null.
+            return null;
+        }
+
+        Node<T> binærTreNode = p; // Setter binærTreNode til 'p', noden vi jobber med.
+
+        if (binærTreNode.forelder.høyre == null) { // Hvis 'p's forelder ikke har et høyre barn, returnerer vi forelder (fordi det betyr at vi er ferdig med begge barna, så vi går til forelder i postorden).
+            return binærTreNode.forelder;
+        } else if (binærTreNode.forelder.høyre.equals(binærTreNode)) { // Hvis 'p' er høyre barn til sin forelder, returnerer vi forelder, fordi vi har besøkt både venstre og høyre barn.
+            return binærTreNode.forelder;
+        } else { // Hvis 'p' er venstre barn og det finnes et høyre barn, finner vi den første noden i postorden i høyre undertre.
+            return førstePostorden(binærTreNode.forelder.høyre); // Finner den første noden i postorden i høyre undertre til forelderen.
+        }
     }
 
     // Oppgave 4
