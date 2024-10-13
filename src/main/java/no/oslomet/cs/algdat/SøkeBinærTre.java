@@ -228,14 +228,101 @@ public class SøkeBinærTre<T> implements Beholder<T> {
     // Oppgave 5
 
     public boolean fjern(T verdi) {
-        throw new UnsupportedOperationException();
+        if (verdi == null || rot == null) return false;  // Returner false hvis verdi er null eller treet er tomt
+
+        Node<T> p = rot, q = null;  // p er noden vi skal fjerne, q er forelder
+
+        while (p != null) {  // Gå gjennom treet for å finne noden som skal fjernes
+            int cmp = comp.compare(verdi, p.verdi);  // Sammenlign verdien
+            if (cmp < 0) {  // Gå til venstre hvis verdien er mindre enn nodens verdi
+                q = p;
+                p = p.venstre;
+            } else if (cmp > 0) {  // Gå til høyre hvis verdien er større
+                q = p;
+                p = p.høyre;
+            } else break;  // Verdi funnet, avbryt løkken
+        }
+
+        if (p == null) return false;  // Verdi finnes ikke i treet
+
+        // Tilfelle 1 og 2: Noden har null eller ett barn
+        if (p.venstre == null || p.høyre == null) {
+            Node<T> barn = (p.venstre != null) ? p.venstre : p.høyre;  // Velg barnet som ikke er null
+            if (p == rot) rot = barn;  // Hvis p er roten, oppdater roten
+            else if (p == q.venstre) q.venstre = barn;  // Oppdater q sin venstre peker
+            else q.høyre = barn;  // Oppdater q sin høyre peker
+            if (barn != null) barn.forelder = q;  // Oppdater barnets forelder-pekeren
+
+        } else {
+
+            // Tilfelle 3: Noden har to barn
+            Node<T> s = p, r = p.høyre;  // Finn minste node i høyre subtre (neste in-order node)
+            while (r.venstre != null) {  // Finn venstre barn i høyre subtre
+                s = r;
+                r = r.venstre;
+            }
+            p.verdi = r.verdi;  // Kopier verdien fra r til p (erstatt nodens verdi)
+            if (s != p) s.venstre = r.høyre;  // Hvis r har et høyre barn, koble det til s
+            else s.høyre = r.høyre;  // Hvis r er direkte høyre barn av p
+            if (r.høyre != null) r.høyre.forelder = s;  // Oppdater forelder-pekeren
+        }
+
+        antall--;  // Reduser antallet noder
+        return true;  // Returner true når verdien er fjernet
+
     }
 
     public int fjernAlle(T verdi) {
-        throw new UnsupportedOperationException();
+        if (verdi == null || rot == null) return 0;  // Returner 0 hvis verdi er null eller treet er tomt
+        int fjernet = 0;  // Teller antall fjernede noder
+
+        while (fjern(verdi)) {  // Så lenge vi klarer å fjerne en node
+            fjernet++;  // Øk teller for hver fjerning
+        }
+
+        return fjernet;  // Returner antallet fjernede noder
     }
 
     public void nullstill() {
-        throw new UnsupportedOperationException();
+        Node fjern = rot;  // Setter 'fjern' til å være roten av treet
+        Node temp = null;   // Midlertidig node for å holde referanse til foreldre
+
+
+        while (!tom()) {  // Mens treet ikke er tomt
+
+            if (førstePostorden(fjern) != null) { // Henter den første noden i postorden for 'fjern'
+                fjern = førstePostorden(fjern); // Hvis det finnes en node i postorden, oppdaterer 'fjern' til denne noden
+            } else {
+                fjern = rot; // Hvis det ikke finnes flere noder i postorden, gå til venstre mest node
+                while (fjern.venstre != null) {  // Fortsett til venstre så lenge venstre barn eksisterer
+                    fjern = fjern.venstre;
+                }
+            }
+
+            if (fjern.venstre == null && fjern.høyre == null) { // Sjekker om noden er et blad (ingen venstre eller høyre barn)
+                if (fjern == rot) {  // Sjekker om 'fjern' er roten
+                    rot = null; // Hvis 'fjern' er roten, sett roten til null
+                    endringer++;  // Øk antall endringer
+                    antall--; // Reduser antall noder
+                    break; // Avslutt løkken siden treet nå er tomt
+                }
+
+                temp = fjern.forelder;     // Lagre referanse til foreldrenoden
+                fjern.forelder = null;  // Nullstill referansen til foreldrenoden
+
+                if (temp.venstre == fjern) {  // Sjekk om 'fjern' er venstre barn av forelderen
+                    temp.venstre = null;  // Nullstill venstre referanse i foreldrenoden
+                } else {
+                    temp.høyre = null;// Nullstill høyre referanse i foreldrenoden
+                }
+
+                fjern.verdi = null; // Nullstill verdien til noden
+                fjern = temp;     // Gå tilbake til foreldrenoden
+
+                endringer++;   // Øk antall endringer
+                antall--;   // Reduser antall noder
+
+            }
+        }
     }
 }
